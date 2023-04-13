@@ -1,0 +1,30 @@
+import { NFTActionCard } from '.'
+import { NFTActionCardProps } from '../../../../libs/uikit/src/lib/types'
+
+export default {
+  component: NFTActionCard,
+  title: 'NFTActionCard',
+  argTypes: {
+    title: { control: { type: 'text' } },
+    secondUser: { control: { type: 'boolean' } },
+    topBorderRadius: { control: { type: 'boolean' } },
+    likeButton: { control: { type: 'boolean' } },
+    background: { control: { type: 'boolean' } },
+    divider: {
+      control: { type: 'select', options: ['TextDivider', 'Divider', 'None'] },
+    },
+  },
+}
+
+const Template = (args: NFTActionCardProps) => <NFTActionCard {...args} />
+
+export const Default: any = Template.bind({})
+Default.args = {
+  setOpenBidModal: () => null,
+  divider: 'TextDivider',
+  likeButton: false,
+  secondUser: true,
+  topBorderRadius: true,
+  background: true,
+  title: 'Featured NFT Name Here',
+}

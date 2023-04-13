@@ -1,0 +1,240 @@
+import {
+  Box,
+  ButtonProps,
+  chakra,
+  ContainerProps,
+  HeadingProps,
+  HStack,
+  InputGroup,
+  InputLeftElement,
+  InputProps,
+  InputRightElement,
+  TextareaProps,
+  TextProps,
+  VStack,
+} from '@chakra-ui/react'
+import { defaultMetaData, formErrorText } from '@nftmall/sdk'
+import { BannerProps, CardSelectButton, ChakraTextProps, reactIcons, theme } from '@nftmall/uikit'
+import { ReactTagInputProps } from '@pathofdev/react-tag-input'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
+import { ChangeEvent, Fragment, memo, useEffect, useRef, useState } from 'react'
+import { MdAddCircle } from 'react-icons/md'
+import { scroller } from 'react-scroll'
+
+const Banner = memo(dynamic<BannerProps>(() => import('@nftmall/uikit').then((module) => module.Banner)))
+const ChakraErrorText = memo(
+  dynamic<TextProps>(() => import('@nftmall/uikit').then((module) => module.ChakraErrorText))
+)
+const ChakraFormLabel = memo(
+  dynamic<TextProps>(() => import('@nftmall/uikit').then((module) => module.ChakraFormLabel))
+)
+const ChakraHeading = memo(dynamic<HeadingProps>(() => import('@nftmall/uikit').then((module) => module.ChakraHeading)))
+const ChakraInput = memo(dynamic<InputProps>(() => import('@nftmall/uikit').then((module) => module.ChakraInput)))
+const ChakraLayout = memo(dynamic<ContainerProps>(() => import('@nftmall/uikit').then((module) => module.ChakraLayout)))
+const ChakraTagInput = memo(
+  dynamic<ReactTagInputProps>(() => import('@nftmall/uikit').then((module) => module.ChakraTagInput))
+)
+const ChakraText = memo(dynamic<ChakraTextProps>(() => import('@nftmall/uikit').then((module) => module.ChakraText)))
+const ChakraTextarea = memo(
+  dynamic<TextareaProps>(() => import('@nftmall/uikit').then((module) => module.ChakraTextarea))
+)
+const PrimaryGradientButton = memo(
+  dynamic<ButtonProps>(() => import('@nftmall/uikit').then((module) => module.PrimaryGradientButton))
+)
+
+function Index() {
+  return <>edit collection page</>
+
+  const router = useRouter()
+  const myRef = useRef()
+  const [isError, setIsError] = useState(false)
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [keywords, setKeywords] = useState<string[]>([])
+  const [royalties, setRoyalties] = useState([{ address: '', percentage: '' }])
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, type: string, id: number) => {
+    if (type === 'name') {
+      setName(e.target.value)
+      setIsError(false)
+    } else {
+      const temp = [...royalties]
+      temp[id][type] = e.target.value
+      setRoyalties(temp)
+    }
+  }
+
+  const handleAddRoyalty = () => {
+    const tmpRoyalties = [...royalties]
+    tmpRoyalties.push({
+      address: '',
+      percentage: '',
+    })
+    setRoyalties(tmpRoyalties)
+  }
+
+  const scrollToSection = () => {
+    scroller.scrollTo('#royalty', {
+      duration: 800,
+      delay: 0,
+      smooth: 'easeInOutQuart',
+    })
+  }
+
+  useEffect(() => {
+    const queryKeys = Object.keys(router.query)
+    if (queryKeys.includes('royalty') && myRef?.current) {
+      scrollToSection()
+    }
+  }, [router])
+
+  return (
+    <Fragment>
+      <NextSeo {...defaultMetaData} title={`Edit Collection | NFTmall`} />
+      <Banner from="mint" />
+      <ChakraLayout display="flex" py={{ base: 0, lg: 10 }}>
+        <VStack spacing={8} align="initial" width="60%" zIndex={1}>
+          <VStack align="flex-start" spacing={4} width="100%">
+            <ChakraHeading as="h2">Edit Collection</ChakraHeading>
+            <ChakraText>
+              Set preferred display name, create your branded profile URL and manage other personal settings
+            </ChakraText>
+          </VStack>
+          <VStack align="flex-start" spacing={8} width="100%">
+            <Box width="100%">
+              <ChakraFormLabel>
+                Name <chakra.span color={theme.colors.errorText}>*</chakra.span>
+              </ChakraFormLabel>
+              <ChakraInput isInvalid={isError} onChange={(e) => handleInputChange(e, 'name', 0)} />
+              {isError && <ChakraErrorText>{formErrorText.name}</ChakraErrorText>}
+            </Box>
+            <Box width="100%">
+              <ChakraFormLabel>URL</ChakraFormLabel>
+              <ChakraText type="secondary" pb={2}>
+                Customize your URL on NFTmall. Must only contain lowercase letters, numbers, and hyphens.
+              </ChakraText>
+              <InputGroup>
+                <InputLeftElement
+                  pointerEvents="none"
+                  children={<ChakraText type="secondary">https://nftmall.io/collection/</ChakraText>}
+                  width={56}
+                  pl={4}
+                />
+                <ChakraInput ml={2} pl={56} isInvalid={isError} onChange={(e) => handleInputChange(e, 'name', 0)} />
+              </InputGroup>
+              {isError && <ChakraErrorText>{formErrorText.name}</ChakraErrorText>}
+            </Box>
+            <Box width="100%">
+              <ChakraFormLabel>Description</ChakraFormLabel>
+              <ChakraTextarea onChange={(e) => setDescription(e.target.value)} />
+            </Box>
+            <Box width="100%">
+              <ChakraFormLabel>Keywords</ChakraFormLabel>
+              <ChakraTagInput tags={keywords} onChange={(newTags) => setKeywords(newTags)} />
+              <ChakraText type="secondary" pt={2}>
+                That will help to find your collection via Search
+              </ChakraText>
+            </Box>
+            <Box width="100%">
+              <ChakraFormLabel>Links</ChakraFormLabel>
+              <VStack justify="flex-start" spacing={4} width="100%">
+                <InputGroup>
+                  <InputLeftElement pointerEvents="none" children={reactIcons.website} width={10} pl={4} />
+                  <ChakraInput pl={14} onChange={(e) => handleInputChange(e, 'website', 0)} placeholder="yoursite.io" />
+                </InputGroup>
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    children={
+                      <HStack spacing={2}>
+                        {reactIcons.discord} <ChakraText type="secondary">https://discord.gg/</ChakraText>
+                      </HStack>
+                    }
+                    width="fit-content"
+                    pl={4}
+                  />
+                  <ChakraInput ml={2} pl={48} onChange={(e) => handleInputChange(e, 'discord', 0)} />
+                </InputGroup>
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    children={
+                      <HStack spacing={2}>
+                        {reactIcons.instagram} <ChakraText type="secondary">https://www.instagram.com/</ChakraText>
+                      </HStack>
+                    }
+                    width="fit-content"
+                    pl={4}
+                  />
+                  <ChakraInput ml={2} pl="272px" onChange={(e) => handleInputChange(e, 'instagram', 0)} />
+                </InputGroup>
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    children={
+                      <HStack spacing={2}>
+                        {reactIcons.medium} <ChakraText type="secondary">https://www.medium.com/</ChakraText>
+                      </HStack>
+                    }
+                    width="fit-content"
+                    pl={4}
+                  />
+                  <ChakraInput ml={2} pl={64} onChange={(e) => handleInputChange(e, 'medium', 0)} />
+                </InputGroup>
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    children={
+                      <HStack spacing={2}>
+                        {reactIcons.telegram} <ChakraText type="secondary">https://t.me/</ChakraText>
+                      </HStack>
+                    }
+                    width="fit-content"
+                    pl={4}
+                  />
+                  <ChakraInput ml={2} pl={36} onChange={(e) => handleInputChange(e, 'telegram', 0)} />
+                </InputGroup>
+              </VStack>
+            </Box>
+            <Box width="100%" ref={myRef}>
+              <ChakraFormLabel>Multiple Royalties</ChakraFormLabel>
+              <VStack align="flex-start" spacing={4} width="100%">
+                <ChakraText type="secondary">Add royalties to all users participated in collection creation</ChakraText>
+                {royalties.map((royalty, index) => (
+                  <VStack align="flex-start" spacing={4} width="100%" key={royalty.address}>
+                    <ChakraText fontWeight="bold">Address #{index + 1}</ChakraText>
+                    <HStack spacing={8} width="100%">
+                      <ChakraInput onChange={(e) => handleInputChange(e, 'address', index)} value={royalty.address} />
+                      <InputGroup>
+                        <ChakraInput
+                          onChange={(e) => handleInputChange(e, 'percentage', index)}
+                          value={royalty.percentage}
+                        />
+                        <InputRightElement pointerEvents="none" children="%" width="fit-content" pr={4} />
+                      </InputGroup>
+                    </HStack>
+                  </VStack>
+                ))}
+                <CardSelectButton onClick={handleAddRoyalty} borderRadius="full" width="100%">
+                  <HStack align="center" justify="center" px={16} spacing={2}>
+                    <MdAddCircle fontSize="24px" />
+                    <ChakraText fontSize="sm" fontWeight="bold">
+                      Add address
+                    </ChakraText>
+                  </HStack>
+                </CardSelectButton>
+              </VStack>
+            </Box>
+          </VStack>
+          <PrimaryGradientButton aria-label="update collection" maxW="fit-content" size="lg" px={16}>
+            Save changes
+          </PrimaryGradientButton>
+        </VStack>
+      </ChakraLayout>
+    </Fragment>
+  )
+}
+
+export default memo(Index)

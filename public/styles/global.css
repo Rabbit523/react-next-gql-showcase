@@ -1,0 +1,24 @@
+.marquee {
+  overflow: hidden;
+  position: relative;
+  animation: MarqueeLeft 50s infinite linear;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes MarqueeLeft
+{
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 45px)); }
+}
+
+.chakra-modal__overlay {
+  backdrop-filter: blur(4px);
+}
+
+/* TODO: there may be a better way. */
+/* .chakra-form__error-message {
+  color: var(--chakra-colors-red)
+} */
